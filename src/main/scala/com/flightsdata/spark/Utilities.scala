@@ -1,10 +1,9 @@
 package com.flightsdata.spark
 
 import org.apache.spark.sql
-import org.apache.spark.sql.{Dataset, SaveMode}
+import org.apache.spark.sql.{SaveMode, SparkSession}
 
 object Utilities {
-  // Constants
   val passengerId: String = "passengerId"
   val flightId: String = "flightId"
   val from: String = "from"
@@ -22,20 +21,33 @@ object Utilities {
   val outputColumn_LastName = "Last name"
   val outputColumn_LongestRun = "Longest Run"
 
-  // Logger init to Error
+  val fileFlightsData ="data/flightData.csv"
+  val filePassengersData = "data/passengers.csv"
+
   def setupLogging(): Unit = {
     import org.apache.log4j.{Level, Logger}
     val rootLogger = Logger.getRootLogger
     rootLogger.setLevel(Level.ERROR)
   }
 
-  // template
   final case class FlightsData(passengerId: Int, flightId: Int, from: String, to: String, date: String)
   final case class PassengersData(passengerId: Int, firstName: String, lastName: String)
 
-  // Write to a file
+  // TODO For Prod Grade application, follow the best practice as described in
+  // https://spark.apache.org/docs/latest/configuration.html#dynamically-loading-spark-properties
+  def createOrGetSparkContext(masterURL: String, appName: String) = {
+    val sparkSession = SparkSession
+      .builder
+      .appName(appName)
+      .master(masterURL)
+      .getOrCreate()
+
+    sparkSession.sparkContext.setLogLevel("ERROR")
+    sparkSession
+  }
+
   def writeToAFile(ds: sql.DataFrame, filePath: String) = {
-    ds.coalesce(1).write.mode(SaveMode.Overwrite).option("header",true).csv(filePath)
+    ds.write.mode(SaveMode.Overwrite).option("header",true).csv(filePath)
   }
 
 }
