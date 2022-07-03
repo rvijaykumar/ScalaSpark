@@ -2,53 +2,46 @@ package com.flightsdata.spark
 
 import com.flightsdata.spark.Utilities._
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql.functions.desc
+import org.apache.spark.sql.functions._
 
+/**
+ * Find the names of the 100 most frequent flyers.
+ */
 object FrequentFlyers {
-
   def main(args: Array[String]): Unit = {
-    // Log to be concise
     setupLogging()
 
-    val joinedDsResult = process("data/flightData.csv", "data/passengers.csv", "local[*]")
-    joinedDsResult.show(100) // output to console or write to a file
+    val sparkSession = createOrGetSparkContext("local[*]", "FrequentFlyers")
 
-    // would have cost impact due to repartition to a single node
-    // writeToAFile(joinedDsResult, "data/output/noOfFlightsByMonth.csv")
+    val joinedDsResult = process(fileFlightsData, filePassengersData, sparkSession)
+
+    joinedDsResult.show(100)
+
+    sparkSession.stop()
   }
 
-  def process(flightDataFilePath: String, passengerDataFilePath: String, masterURL: String) = {
-    // Create a SparkContext using every core of the local machine
-    val spark = SparkSession
-      .builder
-      .appName("TotalNumberOfFlightsByMonth")
-      .master(masterURL)
-      .getOrCreate()
+  def process(flightDataFilePath: String, passengerDataFilePath: String, sparkSession: SparkSession) = {
+    import sparkSession.implicits._
 
-    spark.sparkContext.setLogLevel("ERROR")
-    import spark.implicits._
-
-    // Load each line of the source data into an Dataset
-    val dsFlights = spark.read
+    val dsFlights = sparkSession.read
       .option("header", "true")
       .option("delimiter", ",")
       .option("inferSchema", "true")
       .csv(flightDataFilePath)
       .as[FlightsData]
 
-    val dsPassengers = spark.read
+    val dsPassengers = sparkSession.read
       .option("header", "true")
       .option("delimiter", ",")
       .option("inferSchema", "true")
       .csv(passengerDataFilePath)
       .as[PassengersData]
-      .cache()
 
     val passengersAndFlights = dsFlights.select(passengerId, flightId)
     val top100FrequentFlyersDs = passengersAndFlights
       .groupBy(passengerId)
       .count()
-      .filter($"count" =!= 1) // to be fair to all the passengers who have taken only 1 flight
+      .orderBy(desc("count"))
       .limit(100)
       .cache()
 

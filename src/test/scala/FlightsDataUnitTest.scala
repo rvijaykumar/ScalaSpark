@@ -13,16 +13,27 @@ class FlightsDataUnitTest extends AnyFunSuite {
     assert(result === 100000)
   }
 
+
   test("Total Number Of Flights By Month") {
-    val result = TotalNumberOfFlightsByMonth.process("data/flightData.csv", "local[*]")
+    val sparkSession = createOrGetSparkContext("local[*]", "TotalNumberOfFlightsByMonthUnitTest")
+
+    val result = TotalNumberOfFlightsByMonth.process(fileFlightsData, sparkSession)
     assert(result.count !== 0)
     val output = result.select(outputColumn_NoOfFlights).limit(1).collectAsList().get(0)(0)
     assert(output === 97)
+
+    sparkSession.stop()
   }
 
   test("Frequent Flyers") {
-    val result = FrequentFlyers.process("data/flightData.csv", "data/passengers.csv","local[*]")
+    val sparkSession = createOrGetSparkContext("local[*]", "FrequentFlyersUnitTest")
+
+    val result = FrequentFlyers.process(fileFlightsData, filePassengersData, sparkSession)
     val topPassengerId  = result.select(outputColumn_PassengerId).limit(1).collectAsList().get(0)(0)
-    assert(topPassengerId === 392)
+    assert(topPassengerId === 2068)
+
+    sparkSession.stop()
   }
+
+
 }

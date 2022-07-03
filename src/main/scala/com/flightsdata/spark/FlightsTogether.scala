@@ -2,45 +2,49 @@ package com.flightsdata.spark
 
 import com.flightsdata.spark.Utilities._
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql.functions.{col}
+import org.apache.spark.sql.functions.col
 
-object GreatestNoOfCountries {
+import java.sql.Date
 
+/**
+ * Find the passengers who have been on more than 3 flights together.
+ */
+object FlightsTogether {
   def main(args: Array[String]): Unit = {
-    // Log to be concise
     setupLogging()
 
-    val greatestNoOfCountries = process("data/flightData.csv", "local[*]")
+    val sparkSession = createOrGetSparkContext("local[*]", "FlightsTogether")
+
+    val greatestNoOfCountries = process(fileFlightsData, sparkSession)
 //    greatestNoOfCountries.show()
   }
 
-  def process(flightDataFilePath: String,  masterURL: String) = {
-    // Create a SparkContext using every core of the local machine
-    val spark = SparkSession
-      .builder
-      .appName("GreatestNoOfCountries")
-      .master(masterURL)
-      .getOrCreate()
-
-    spark.sparkContext.setLogLevel("ERROR")
-    import spark.implicits._
+  def process(flightDataFilePath: String,  sparkSession: SparkSession) = {
+    sparkSession.sparkContext.setLogLevel("ERROR")
+    import sparkSession.implicits._
 
     // Load each line of the source data into an Dataset
-    val ds = spark.read
+    val ds = sparkSession.read
       .option("header", "true")
       .option("delimiter", ",")
       .option("inferSchema", "true")
       .csv(flightDataFilePath)
       .as[FlightsData]
 
-    val countriesVisitedByPassenger = ds
-        .select(passengerId, from, to)
-        .filter(col(from) =!= "uk" && col(to) =!= "uk")
-        .groupBy(passengerId)
-        .count()
-      .withColumnRenamed("count", "Longest Run")
-    countriesVisitedByPassenger.show()
+//    val countriesVisitedByPassenger = ds
+//        .groupBy( flight)
+//        .count()
+//      .orderBy("count")
+//
+//    countriesVisitedByPassenger.show()
 
+//
+//    def flownTogether(atLeastNTimes: Int) = {...
+//    }
+//
+//    def flownTogether(atLeastNTimes: Int, from: Date, to: Date) = {
+//      ...
+//    }
 
 
 

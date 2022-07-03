@@ -4,33 +4,27 @@ import com.flightsdata.spark.Utilities._
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.functions.{col, month, to_date}
 
+/**
+ * Find the total number of flights for each month.
+ */
 object TotalNumberOfFlightsByMonth {
-
   def main(args: Array[String]): Unit = {
-    // Log to be concise
     setupLogging()
 
-    val totalNoOfFlightsByMonth = process("data/flightData.csv", "local[*]")
-    totalNoOfFlightsByMonth.show()
+    val sparkSession = createOrGetSparkContext("local[*]", "TotalNumberOfFlightsByMonth")
 
-    // only for this exercise - writing to a file
-    // would have cost impact due to repartition to a single node
+    val totalNoOfFlightsByMonth = process(fileFlightsData, sparkSession)
+
+    totalNoOfFlightsByMonth.show()
     writeToAFile(totalNoOfFlightsByMonth, "data/output/noOfFlightsByMonth.csv")
+
+    sparkSession.stop()
   }
 
-  def process(flightDataFilePath: String,  masterURL: String) = {
-    // Create a SparkContext using every core of the local machine
-    val spark = SparkSession
-      .builder
-      .appName("TotalNumberOfFlightsByMonth")
-      .master(masterURL)
-      .getOrCreate()
+  def process(flightDataFilePath: String, sparkSession: SparkSession) = {
+    import sparkSession.implicits._
 
-    spark.sparkContext.setLogLevel("ERROR")
-    import spark.implicits._
-
-    // Load each line of the source data into an Dataset
-    val ds = spark.read
+    val ds = sparkSession.read
       .option("header", "true")
       .option("delimiter", ",")
       .option("inferSchema", "true")
@@ -39,7 +33,7 @@ object TotalNumberOfFlightsByMonth {
 
     val flightsByMonth = ds.withColumn(flightMonth, month(to_date(col(flightDate), dateFormat)))
     val distinctFlightsByMonth = flightsByMonth.select(flightMonth, flightId, from, to).distinct()
-    // Write to the Console
+
      distinctFlightsByMonth
       .groupBy(flightMonth)
       .count()
