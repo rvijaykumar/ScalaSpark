@@ -16,7 +16,10 @@ object Utilities {
   val dateFormat = "yyyy-MM-dd"
 
   val outputColumn_PassengerId = "Passenger ID"
+  val outputColumn_Passenger1Id = "Passenger 1 ID"
+  val outputColumn_Passenger2Id = "Passenger 2 ID"
   val outputColumn_NoOfFlights = "Number of Flights"
+  val outputColumn_NoOfFlightsTogether = "Number of flights together"
   val outputColumn_FirstName = "First name"
   val outputColumn_LastName = "Last name"
   val outputColumn_LongestRun = "Longest Run"
