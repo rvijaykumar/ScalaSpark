@@ -13,8 +13,8 @@ object GreatestNoOfCountries {
 
     val sparkSession = createOrGetSparkContext("local[*]", "GreatestNoOfCountries")
 
-    val greatestNoOfCountries = process(fileFlightsData, sparkSession)
-    greatestNoOfCountries.show()
+    val greatestNoOfCountriesDs = process(fileFlightsData, sparkSession)
+    writeToAFile(greatestNoOfCountriesDs, "data/output/greatestNoOfCountries.csv")
 
     sparkSession.stop()
   }
@@ -33,8 +33,9 @@ object GreatestNoOfCountries {
         .filter(col(from) =!= "uk" && col(to) =!= "uk")
         .groupBy(passengerId)
         .count()
-       .withColumnRenamed("passengerId", outputColumn_PassengerId)
-       .withColumnRenamed("count", "Longest Run")
+        .orderBy("count")
+        .withColumnRenamed("passengerId", outputColumn_PassengerId)
+        .withColumnRenamed("count", "Longest Run")
 
   }
 }

@@ -14,8 +14,6 @@ object TotalNumberOfFlightsByMonth {
     val sparkSession = createOrGetSparkContext("local[*]", "TotalNumberOfFlightsByMonth")
 
     val totalNoOfFlightsByMonth = process(fileFlightsData, sparkSession)
-
-    totalNoOfFlightsByMonth.show()
     writeToAFile(totalNoOfFlightsByMonth, "data/output/noOfFlightsByMonth.csv")
 
     sparkSession.stop()

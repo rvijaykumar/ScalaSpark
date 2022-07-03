@@ -25,6 +25,8 @@ object FlightsTogether {
     // Passengers who have been on more than N flights together within the range (from,to).
     val flightsTogetherByDatesDs = flownTogether(flightsTogetherDs, 5, Date.valueOf("2017-05-01"), Date.valueOf("2017-12-01"))
     writeToAFile(flightsTogetherByDatesDs, "data/output/moreThanNFlightsTogetherBetweenDates.csv")
+
+    sparkSession.stop()
   }
 
   def process(flightDataFilePath: String,  sparkSession: SparkSession) = {
@@ -42,7 +44,7 @@ object FlightsTogether {
     // As the output requires passenger Ids from the same dataset in 2 columns and mapping between the two,
     // we need to self-join on the same dataset.
     // Use < to compare the 2 DataSets on Passenger Ids to remove duplicates
-    // Using =!= gives some duplicates as the same passendger will get repeated in Passenger 1 Id & Passenger 2 Id columns
+    // Using =!= give duplicates as the same passenger will get repeated in Passenger 1 Id & Passenger 2 Id columns
     dsFlights.as("dsRight")
       .withColumnRenamed(passengerId, outputColumn_Passenger1Id)
       .join(dsFlights.as("dsLeft"))

@@ -13,9 +13,8 @@ object FrequentFlyers {
 
     val sparkSession = createOrGetSparkContext("local[*]", "FrequentFlyers")
 
-    val joinedDsResult = process(fileFlightsData, filePassengersData, sparkSession)
-
-    joinedDsResult.show(100)
+    val frequentFlyersDs = process(fileFlightsData, filePassengersData, sparkSession)
+    writeToAFile(frequentFlyersDs, "data/output/frequentFlyers.csv")
 
     sparkSession.stop()
   }
