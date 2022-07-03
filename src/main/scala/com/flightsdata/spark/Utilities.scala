@@ -36,7 +36,7 @@ object Utilities {
   final case class FlightsData(passengerId: Int, flightId: Int, from: String, to: String, date: String)
   final case class PassengersData(passengerId: Int, firstName: String, lastName: String)
 
-  // TODO For Prod Grade application, follow the best practice as described in
+  // For Prod Grade application, follow the best practice as described in
   // https://spark.apache.org/docs/latest/configuration.html#dynamically-loading-spark-properties
   def createOrGetSparkContext(masterURL: String, appName: String) = {
     val sparkSession = SparkSession

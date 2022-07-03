@@ -3,8 +3,10 @@ import org.scalatest.funsuite.AnyFunSuite
 import com.flightsdata.spark.Utilities._
 import org.apache.spark.sql.functions.col
 
+import java.sql.Date
+
 /**
- * Unit Tests for validate the processing logic
+ * Unit Tests to validate the processing logic of Flights Data
  * Note: Using the same test data for ease of use
  */
 
@@ -48,12 +50,27 @@ class FlightsDataUnitTest extends AnyFunSuite {
   test("Find the passengers who have been on more than 3 flights together.") {
     val sparkSession = createOrGetSparkContext("local[*]", "FrequentFlyersUnitTest")
 
-    val result = FlightsTogether.process(fileFlightsData, sparkSession)
+    val result = FlightsTogether.flownTogether(FlightsTogether.process(fileFlightsData, sparkSession))
     val passenger714And770Together  = result
       .where(col(outputColumn_Passenger1Id) === "714" && col(outputColumn_Passenger2Id) === "770")
       .select(outputColumn_NoOfFlightsTogether)
       .collectAsList().get(0)(0)
     assert(passenger714And770Together === 5)
+
+    sparkSession.stop()
+  }
+
+  test("Find the passengers who have been on more than N flights together within the range (from,to).") {
+    val sparkSession = createOrGetSparkContext("local[*]", "FrequentFlyersUnitTest")
+
+    val result = FlightsTogether.flownTogether(FlightsTogether.process(fileFlightsData, sparkSession), 5, Date.valueOf("2017-05-01"), Date.valueOf("2017-12-01"))
+    val passenger157And7780Together  = result
+      .where(col(outputColumn_Passenger1Id) === "157" && col(outputColumn_Passenger2Id) === "7780")
+      .select(outputColumn_NoOfFlightsTogether, "From", "To")
+      .collectAsList().get(0)
+    assert(passenger157And7780Together(0) === 6)
+    assert(passenger157And7780Together(1) === "2017-09-16")
+    assert(passenger157And7780Together(2) === "2017-11-11")
 
     sparkSession.stop()
   }
