@@ -31,6 +31,7 @@ object FlightsTogether {
 
     // As the output requires passenger Ids from the same dataset in 2 columns and mapping between the two,
     // we need to self-join on the same dataset.
+    // Use < to compare the 2 DataSets on Passenger Ids to remove duplicates
     dsFlights.as("dsRight")
       .withColumnRenamed(passengerId, outputColumn_Passenger1Id)
       .join(dsFlights.as("dsLeft"))
@@ -38,10 +39,10 @@ object FlightsTogether {
       .where(col(outputColumn_Passenger1Id) < col(outputColumn_Passenger2Id) &&
         $"dsRight.flightId" === $"dsLeft.flightId" &&
         $"dsRight.date" === $"dsLeft.date")
+      .cache()
       .groupBy(outputColumn_Passenger1Id, outputColumn_Passenger2Id)
       .count()
       .where(col("count") > 3)
       .withColumnRenamed("count", outputColumn_NoOfFlightsTogether)
-    
   }
 }

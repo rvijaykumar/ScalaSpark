@@ -1,4 +1,4 @@
-import com.flightsdata.spark.{FrequentFlyers, GreatestNoOfCountries, HelloWorld, TotalNumberOfFlightsByMonth}
+import com.flightsdata.spark.{FlightsTogether, FrequentFlyers, GreatestNoOfCountries, HelloWorld, TotalNumberOfFlightsByMonth}
 import org.scalatest.funsuite.AnyFunSuite
 import com.flightsdata.spark.Utilities._
 import org.apache.spark.sql.functions.col
@@ -41,6 +41,19 @@ class FlightsDataUnitTest extends AnyFunSuite {
     val result = GreatestNoOfCountries.process(fileFlightsData, sparkSession)
     val passenger148Count  = result.where(col(outputColumn_PassengerId) === "148").select(outputColumn_LongestRun).collectAsList().get(0)(0)
     assert(passenger148Count === 10)
+
+    sparkSession.stop()
+  }
+
+  test("Find the passengers who have been on more than 3 flights together.") {
+    val sparkSession = createOrGetSparkContext("local[*]", "FrequentFlyersUnitTest")
+
+    val result = FlightsTogether.process(fileFlightsData, sparkSession)
+    val passenger714And770Together  = result
+      .where(col(outputColumn_Passenger1Id) === "714" && col(outputColumn_Passenger2Id) === "770")
+      .select(outputColumn_NoOfFlightsTogether)
+      .collectAsList().get(0)(0)
+    assert(passenger714And770Together === 5)
 
     sparkSession.stop()
   }
