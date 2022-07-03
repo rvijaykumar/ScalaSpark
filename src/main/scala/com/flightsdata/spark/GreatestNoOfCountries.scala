@@ -33,6 +33,8 @@ object GreatestNoOfCountries {
         .filter(col(from) =!= "uk" && col(to) =!= "uk")
         .groupBy(passengerId)
         .count()
-      .withColumnRenamed("count", "Longest Run")
+       .withColumnRenamed("passengerId", outputColumn_PassengerId)
+       .withColumnRenamed("count", "Longest Run")
+
   }
 }

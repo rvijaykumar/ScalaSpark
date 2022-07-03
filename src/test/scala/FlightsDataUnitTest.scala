@@ -1,6 +1,7 @@
-import com.flightsdata.spark.{FrequentFlyers, HelloWorld, TotalNumberOfFlightsByMonth}
+import com.flightsdata.spark.{FrequentFlyers, GreatestNoOfCountries, HelloWorld, TotalNumberOfFlightsByMonth}
 import org.scalatest.funsuite.AnyFunSuite
 import com.flightsdata.spark.Utilities._
+import org.apache.spark.sql.functions.col
 
 /**
  * Unit Tests for validate the processing logic
@@ -13,19 +14,18 @@ class FlightsDataUnitTest extends AnyFunSuite {
     assert(result === 100000)
   }
 
-
-  test("Total Number Of Flights By Month") {
+  test("Find the total number of flights for each month") {
     val sparkSession = createOrGetSparkContext("local[*]", "TotalNumberOfFlightsByMonthUnitTest")
 
     val result = TotalNumberOfFlightsByMonth.process(fileFlightsData, sparkSession)
     assert(result.count !== 0)
-    val output = result.select(outputColumn_NoOfFlights).limit(1).collectAsList().get(0)(0)
-    assert(output === 97)
+    val firstMonthTotalNoOfFlights = result.select(outputColumn_NoOfFlights).limit(1).collectAsList().get(0)(0)
+    assert(firstMonthTotalNoOfFlights === 97)
 
     sparkSession.stop()
   }
 
-  test("Frequent Flyers") {
+  test("Find the names of the 100 most frequent flyers") {
     val sparkSession = createOrGetSparkContext("local[*]", "FrequentFlyersUnitTest")
 
     val result = FrequentFlyers.process(fileFlightsData, filePassengersData, sparkSession)
@@ -35,5 +35,13 @@ class FlightsDataUnitTest extends AnyFunSuite {
     sparkSession.stop()
   }
 
+  test("Find the greatest number of countries a passenger has been in without being in the UK.") {
+    val sparkSession = createOrGetSparkContext("local[*]", "FrequentFlyersUnitTest")
 
+    val result = GreatestNoOfCountries.process(fileFlightsData, sparkSession)
+    val passenger148Count  = result.where(col(outputColumn_PassengerId) === "148").select(outputColumn_LongestRun).collectAsList().get(0)(0)
+    assert(passenger148Count === 10)
+
+    sparkSession.stop()
+  }
 }
