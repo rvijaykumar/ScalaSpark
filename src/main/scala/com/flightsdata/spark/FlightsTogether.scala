@@ -11,10 +11,15 @@ import java.sql.Date
  * Find the passengers who have been on more than 3 flights together.
  */
 object FlightsTogether {
+  @throws(classOf[Exception])
   def main(args: Array[String]): Unit = {
     setupLogging()
 
-    val sparkSession = createSparkContext("local[*]", "FlightsTogether")
+    if (args.length == 0 || args.length == 1) {
+      throw new Exception("The run time program arguments need to be provided in the format `masterURL`, `Application Name`")
+    }
+
+    val sparkSession = createSparkContext(args(0), args(1))
 
     val flightsTogetherDs = process(fileFlightsData, sparkSession)
 
