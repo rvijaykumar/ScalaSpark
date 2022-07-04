@@ -33,3 +33,6 @@ Recommend
 1. Read and understand the static data under `data` folder
 2. Read the unit tests
 3. Read the business logic as each use-case is separated into individual Spark jobs
+
+# Further Enhancements
+1. Add a pre-hook handler to run the unit tests for `git commit` to ensure any code changes do not break the existing logic
