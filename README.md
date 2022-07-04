@@ -19,6 +19,15 @@ This project follows the standard folder structure and source code are found und
 
 This is configured to run in the local or client mode setup and if you were to run in the `cluster` mode, you may want to externalise the cluster URL to the SparkSession as `Program Arguments`
 
+The use-case `FlightsTogether` is configured to take in the `local` or `cluster` URL and the `Application Name` from the command line `Program Arguments`
+to show how these applications can be run in different environments by externalising the run time arguments.
+Eg: `bin/spark-submit --class classname -Xms256m -Xmx1g project.jar "arg1"`
+    `String someArgument = args[0];`
+
+The `program arguments` for `FlightsTogether` is `"local[*]" "TotalNumberOfFlightsByMonth"`
+
+The rest of the applications are tested using the Run/ Debug options in the Editor
+
 # How to Use the Project
 Recommend 
 1. Read and understand the static data under `data` folder
