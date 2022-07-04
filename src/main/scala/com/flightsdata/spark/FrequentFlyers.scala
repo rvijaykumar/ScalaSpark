@@ -11,7 +11,7 @@ object FrequentFlyers {
   def main(args: Array[String]): Unit = {
     setupLogging()
 
-    val sparkSession = createOrGetSparkContext("local[*]", "FrequentFlyers")
+    val sparkSession = createSparkContext("local[*]", "FrequentFlyers")
 
     val frequentFlyersDs = process(fileFlightsData, filePassengersData, sparkSession)
     writeToAFile(frequentFlyersDs, "data/output/frequentFlyers.csv")

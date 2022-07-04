@@ -11,7 +11,7 @@ object GreatestNoOfCountries {
   def main(args: Array[String]): Unit = {
     setupLogging()
 
-    val sparkSession = createOrGetSparkContext("local[*]", "GreatestNoOfCountries")
+    val sparkSession = createSparkContext("local[*]", "GreatestNoOfCountries")
 
     val greatestNoOfCountriesDs = process(fileFlightsData, sparkSession)
     writeToAFile(greatestNoOfCountriesDs, "data/output/greatestNoOfCountries.csv")

@@ -14,7 +14,7 @@ object FlightsTogether {
   def main(args: Array[String]): Unit = {
     setupLogging()
 
-    val sparkSession = createOrGetSparkContext("local[*]", "FlightsTogether")
+    val sparkSession = createSparkContext("local[*]", "FlightsTogether")
 
     val flightsTogetherDs = process(fileFlightsData, sparkSession)
 

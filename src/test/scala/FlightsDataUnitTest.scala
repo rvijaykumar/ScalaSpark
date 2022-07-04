@@ -17,7 +17,7 @@ class FlightsDataUnitTest extends AnyFunSuite {
   }
 
   test("Find the total number of flights for each month") {
-    val sparkSession = createOrGetSparkContext("local[*]", "TotalNumberOfFlightsByMonthUnitTest")
+    val sparkSession = createSparkContext("local[*]", "TotalNumberOfFlightsByMonthUnitTest")
 
     val result = TotalNumberOfFlightsByMonth.process(fileFlightsData, sparkSession)
     assert(result.count !== 0)
@@ -28,7 +28,7 @@ class FlightsDataUnitTest extends AnyFunSuite {
   }
 
   test("Find the names of the 100 most frequent flyers") {
-    val sparkSession = createOrGetSparkContext("local[*]", "FrequentFlyersUnitTest")
+    val sparkSession = createSparkContext("local[*]", "FrequentFlyersUnitTest")
 
     val result = FrequentFlyers.process(fileFlightsData, filePassengersData, sparkSession)
     val topPassengerId  = result.select(outputColumn_PassengerId).limit(1).collectAsList().get(0)(0)
@@ -38,7 +38,7 @@ class FlightsDataUnitTest extends AnyFunSuite {
   }
 
   test("Find the greatest number of countries a passenger has been in without being in the UK.") {
-    val sparkSession = createOrGetSparkContext("local[*]", "GreatestNoOfCountriesUnitTest")
+    val sparkSession = createSparkContext("local[*]", "GreatestNoOfCountriesUnitTest")
 
     val result = GreatestNoOfCountries.process(fileFlightsData, sparkSession)
     val passenger148Count  = result.where(col(outputColumn_PassengerId) === "148").select(outputColumn_LongestRun).collectAsList().get(0)(0)
@@ -48,7 +48,7 @@ class FlightsDataUnitTest extends AnyFunSuite {
   }
 
   test("Find the passengers who have been on more than 3 flights together.") {
-    val sparkSession = createOrGetSparkContext("local[*]", "3FlightsTogetherUnitTest")
+    val sparkSession = createSparkContext("local[*]", "3FlightsTogetherUnitTest")
 
     val result = FlightsTogether.flownTogether(FlightsTogether.process(fileFlightsData, sparkSession))
     val passenger714And770Together  = result
@@ -61,7 +61,7 @@ class FlightsDataUnitTest extends AnyFunSuite {
   }
 
   test("Find the passengers who have been on more than N flights together within the range (from,to).") {
-    val sparkSession = createOrGetSparkContext("local[*]", "NFlightsTogetherUnitTest")
+    val sparkSession = createSparkContext("local[*]", "NFlightsTogetherUnitTest")
 
     val result = FlightsTogether.flownTogether(FlightsTogether.process(fileFlightsData, sparkSession), 5, Date.valueOf("2017-05-01"), Date.valueOf("2017-12-01"))
     val passenger157And7780Together  = result

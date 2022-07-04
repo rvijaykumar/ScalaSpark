@@ -11,7 +11,7 @@ object TotalNumberOfFlightsByMonth {
   def main(args: Array[String]): Unit = {
     setupLogging()
 
-    val sparkSession = createOrGetSparkContext("local[*]", "TotalNumberOfFlightsByMonth")
+    val sparkSession = createSparkContext("local[*]", "TotalNumberOfFlightsByMonth")
 
     val totalNoOfFlightsByMonth = process(fileFlightsData, sparkSession)
     writeToAFile(totalNoOfFlightsByMonth, "data/output/noOfFlightsByMonth.csv")

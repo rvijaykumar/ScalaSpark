@@ -9,6 +9,9 @@ import org.apache.log4j._
  */
 object HelloWorld {
   def main(args: Array[String]): Unit = {
+    println(
+      args(0)
+    )
     val numLines = process
     println("Hello world! The file has " + numLines + " lines.")
   }

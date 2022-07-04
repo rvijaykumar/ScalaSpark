@@ -38,7 +38,7 @@ object Utilities {
 
   // For Prod Grade application, follow the best practice as described in
   // https://spark.apache.org/docs/latest/configuration.html#dynamically-loading-spark-properties
-  def createOrGetSparkContext(masterURL: String, appName: String) = {
+  def createSparkContext(masterURL: String, appName: String) = {
     val sparkSession = SparkSession
       .builder
       .appName(appName)
