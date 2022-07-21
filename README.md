@@ -1,5 +1,5 @@
 # Project's Title 
-FlightsData
+Scala Spark Exercise
 
 # Project Description
 The project aims to provide meaningful insights using the data from flights and passengers movements.
